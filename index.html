@@ -6,8 +6,8 @@
 <title>Lomba Desain Website AI</title>
 <style>
 :root{--bg:#050f2e;--line:rgba(110,160,255,.4);--tx:#fff;--mut:#a9bdf0;--acc:#3b82f6;--ok:#22e06b;--warn:#ffd21a;--bad:#ff4d6d;
---c1:#22d3ee;--c2:#2df2b0;--c3:#ffd91a;--c4:#ff4fd8;--c5:#b472ff;
---f1:#0a4fe0;--f2:#0b8a73;--f3:#a07a05;--f4:#a3158f;--f5:#5a28c4;
+--c1:#22d3ee;--c2:#2df2b0;--c3:#ffd91a;--c4:#ff4fd8;--c5:#b472ff;--c6:#ff8a3d;--c7:#ff5470;--c8:#a3e635;--c9:#38bdf8;--c10:#e5e7eb;
+--f1:#0a4fe0;--f2:#0b8a73;--f3:#a07a05;--f4:#a3158f;--f5:#5a28c4;--f6:#a84a08;--f7:#a31233;--f8:#4c7a0a;--f9:#075985;--f10:#374151;
 color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
@@ -38,7 +38,8 @@ main{flex:1;min-height:0;position:relative}
 section{position:absolute;inset:0;padding:4px 1.4vw 1.6vh;display:none;flex-direction:column;gap:12px}
 section.show{display:flex}
 .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.cols{flex:1;min-height:0;display:grid;grid-template-columns:repeat(5,1fr);gap:1.1vw}
+.cols{flex:1;min-height:0;display:grid;gap:1.1vw}
+.cols.two h2{font-size:clamp(12px,2.2vh,20px)}.cols.two .num{width:clamp(26px,4.4vh,44px);height:clamp(26px,4.4vh,44px);font-size:clamp(14px,2.6vh,24px)}.cols.two .hd{padding:8px 10px 2px}.cols.two .col{border-radius:18px}
 .col{background:linear-gradient(165deg,var(--cf),color-mix(in srgb,var(--cf) 30%,#030a20));border:3px solid var(--cc);border-radius:24px;box-shadow:0 0 18px var(--cc),inset 0 0 26px color-mix(in srgb,var(--cc) 45%,transparent);display:flex;flex-direction:column;min-height:0}
 .hd{display:flex;align-items:center;gap:10px;padding:12px 12px 4px}
 .num{flex:none;width:clamp(30px,6vh,56px);height:clamp(30px,6vh,56px);border-radius:50%;background:var(--cc);color:#08122e;display:grid;place-items:center;font-size:clamp(16px,3.6vh,34px);font-weight:900;box-shadow:0 0 14px var(--cc)}
@@ -64,9 +65,9 @@ dialog{background:#0c1d57;color:var(--tx);border:1px solid var(--line);border-ra
 dialog::backdrop{background:rgba(0,0,0,.65)}
 label{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}
 input,textarea{width:100%;font:inherit;color:var(--tx);background:#06143f;border:1px solid var(--line);border-radius:8px;padding:8px 10px}
-.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.g5{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 .row{display:flex;gap:10px;align-items:end}
-@media (max-width:800px){.robot,.logo{display:none}.cols{grid-template-columns:repeat(2,1fr);overflow:auto}.g5{grid-template-columns:1fr 1fr}}
+@media (max-width:800px){.robot,.logo{display:none}.cols{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:none!important;overflow:auto}.col{min-height:260px}.g5{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body data-tab="u">
@@ -115,7 +116,8 @@ input,textarea{width:100%;font:inherit;color:var(--tx);background:#06143f;border
   <h2 style="margin:0 0 4px">Pengaturan</h2>
   <label>Judul acara</label><input id="fTitle">
   <label>Link pengumpulan karya (tampil di bawah timer; kosongkan untuk menyembunyikan)</label><input id="fLink" placeholder="https://...">
-  <label>5 tema (isi manual)</label>
+  <div class="row"><div style="flex:1;max-width:260px"><label>Jumlah tema (3–10)</label><input id="fN" type="number" min="3" max="10" value="5"></div></div>
+  <label>Tema (isi manual, boleh berupa kalimat)</label>
   <div class="g5" id="fThemes"></div>
   <label>Daftar siswa, satu nama per baris (kosongkan untuk memakai nomor urut)</label>
   <textarea id="fNames" rows="8" placeholder="Contoh:&#10;Andi&#10;Budi&#10;Citra"></textarea>
@@ -142,12 +144,14 @@ $("#btnFs").onclick=()=>{try{document.fullscreenElement?document.exitFullscreen(
 /* settings */
 function students(){const l=S.names.split("\n").map(x=>x.trim()).filter(Boolean);
  return l.length?l:Array.from({length:S.count},(_,i)=>"No. "+(i+1))}
+function buildThemes(n,v){const box=$("#fThemes");box.innerHTML="";for(let i=0;i<n;i++){const e=document.createElement("input");e.value=v[i]||"";e.placeholder="Tema "+(i+1);box.appendChild(e)}}
+$("#fN").onchange=()=>{const n=Math.max(3,Math.min(10,Math.round(+$("#fN").value)||5));$("#fN").value=n;buildThemes(n,[...document.querySelectorAll("#fThemes input")].map(e=>e.value))};
 function fill(){$("#fTitle").value=S.title;$("#fLink").value=S.link;$("#fNames").value=S.names;$("#fCount").value=S.count;$("#fMin").value=S.min;
- $("#fThemes").innerHTML="";S.themes.forEach((t,i)=>{const e=document.createElement("input");e.value=t;e.dataset.i=i;e.placeholder="Tema "+(i+1);$("#fThemes").appendChild(e)})}
+ $("#fN").value=S.themes.length;buildThemes(S.themes.length,S.themes)}
 $("#btnSet").onclick=()=>{fill();$("#dlg").showModal()};
 $("#fSave").onclick=()=>{
  S.title=$("#fTitle").value.trim()||DEF.title;S.link=$("#fLink").value.trim();
- S.themes=[...document.querySelectorAll("#fThemes input")].map((e,i)=>e.value.trim()||"Tema "+(i+1));
+ {const N=Math.max(3,Math.min(10,Math.round(+$("#fN").value)||5)),v=[...document.querySelectorAll("#fThemes input")].map(e=>e.value.trim());S.themes=Array.from({length:N},(_,i)=>v[i]||"Tema "+(i+1))}
  S.names=$("#fNames").value;S.count=Math.max(1,Math.min(200,+$("#fCount").value||40));
  S.min=Math.max(1,Math.min(600,+$("#fMin").value||60));
  save();$("#dlg").close();apply();resetTimer(S.min*60)};
@@ -155,7 +159,7 @@ $("#fSave").onclick=()=>{
 /* undi */
 let timers=[];
 function render(cols,reveal){
- const box=$("#cols");box.innerHTML="";
+ const box=$("#cols");box.innerHTML="";const NN=cols.length,two=NN>5,cn=two?Math.ceil(NN/2):NN;box.className="cols"+(two?" two":"");box.style.gridTemplateColumns="repeat("+cn+",minmax(0,1fr))";box.style.gridTemplateRows="repeat("+(two?2:1)+",minmax(0,1fr))";
  cols.forEach((arr,i)=>{
   const c=document.createElement("div");c.className="col";c.style.setProperty("--cc","var(--c"+(i+1)+")");c.style.setProperty("--cf","var(--f"+(i+1)+")");
   c.innerHTML='<div class="hd"><b class="num"></b><h2></h2></div><div class="n"></div><div class="chips"></div>';
@@ -165,25 +169,25 @@ function render(cols,reveal){
  return box.querySelectorAll(".col");
 }
 function showEmpty(){
- const cs=render([[],[],[],[],[]]);
+ const cs=render(S.themes.map(()=>[]));
  cs.forEach((c,i)=>c.querySelector(".n").textContent="0 siswa");
  const n=students().length;
- $("#info").textContent=n+" siswa · 5 tema · pembagian acak, selisih antar tema maksimal 1 orang";
+ $("#info").textContent=n+" siswa · "+S.themes.length+" tema · pembagian acak, selisih antar tema maksimal 1 orang"+(n<S.themes.length?" · siswa lebih sedikit dari tema, ada tema kosong":"");
 }
 function draw(){
  timers.forEach(clearInterval);timers=[];
  const list=students();
  for(let i=list.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[list[i],list[j]]=[list[j],list[i]]}
- const cols=[[],[],[],[],[]];list.forEach((n,i)=>cols[i%5].push(n));
+ const N=S.themes.length,cols=Array.from({length:N},()=>[]);list.forEach((n,i)=>cols[i%N].push(n));
  const cs=render(cols);let k=0;const order=list.map((n,i)=>i);
  $("#btnDraw").disabled=true;
  const gap=Math.max(60,Math.min(250,6000/list.length));
  const t=setInterval(()=>{
   if(k>=list.length){clearInterval(t);$("#btnDraw").disabled=false;$("#btnDraw").textContent="Undi Ulang";return}
-  const col=k%5,name=list[k];
+  const col=k%cols.length,name=list[k];
   const ch=document.createElement("span");ch.className="chip";ch.textContent=name;
   cs[col].querySelector(".chips").appendChild(ch);
-  cs[col].querySelector(".n").textContent=cols[col].slice(0,Math.floor(k/5)+1).length+" / "+cols[col].length+" siswa";
+  cs[col].querySelector(".n").textContent=cols[col].slice(0,Math.floor(k/cols.length)+1).length+" / "+cols[col].length+" siswa";
   k++;
  },gap);
  timers.push(t);
